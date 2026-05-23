@@ -689,7 +689,7 @@
     .site-nav { display: none; }
   }
 
-  /* Cross-page navigation */
+  /* Cross-page navigation - unified across both pages */
   .site-nav {
     position: sticky;
     top: 0;
@@ -710,12 +710,16 @@
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    line-height: 1.4;
   }
   .site-nav__label {
     color: #6A6E7A;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: inherit;
+    font-family: inherit;
+    letter-spacing: inherit;
   }
   .site-nav__links {
     display: flex;
@@ -727,21 +731,45 @@
     border-radius: 999px;
     color: #6A6E7A;
     text-decoration: none;
-    transition: background 0.12s, color 0.12s;
+    font-size: inherit;
+    font-family: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
   }
   .site-nav__links a:hover { color: #15171F; }
   .site-nav__links a.is-active {
     background: #15171F;
     color: #FFFFFF;
   }
+
+  /* Mobile: force compact size, override any inherited anchor styles */
   @media (max-width: 640px) {
-    .site-nav__inner { padding: 8px 14px; gap: 10px; }
-    .site-nav__label {
-      font-size: 9px;
-      letter-spacing: 0.08em;
-      max-width: 40%;
+    .site-nav__inner {
+      padding: 7px 12px !important;
+      gap: 10px !important;
+      font-size: 9px !important;
+      letter-spacing: 0.06em !important;
     }
-    .site-nav__links a { padding: 4px 9px; font-size: 9px; }
+    .site-nav__label {
+      max-width: 42% !important;
+      font-size: 9px !important;
+    }
+    .site-nav__links a {
+      padding: 4px 9px !important;
+      font-size: 9px !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .site-nav__inner {
+      padding: 6px 10px !important;
+      font-size: 8px !important;
+    }
+    .site-nav__label { font-size: 8px !important; }
+    .site-nav__links a {
+      font-size: 8px !important;
+      padding: 3px 7px !important;
+    }
   }
 </style>
 </head>
