@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FounderNest — Candidate Search Design Case</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Newsreader:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Locally-resolvable fonts so the PDF export looks right even without web access */
+  @font-face { font-family: 'PagellaFB'; src: url('file:///usr/share/texmf/fonts/opentype/public/tex-gyre/texgyrepagella-regular.otf') format('opentype'); font-weight: 400; }
+  @font-face { font-family: 'PagellaFB'; src: url('file:///usr/share/texmf/fonts/opentype/public/tex-gyre/texgyrepagella-italic.otf') format('opentype'); font-weight: 400; font-style: italic; }
+  @font-face { font-family: 'PagellaFB'; src: url('file:///usr/share/texmf/fonts/opentype/public/tex-gyre/texgyrepagella-bold.otf') format('opentype'); font-weight: 600; }
+  @font-face { font-family: 'PagellaFB'; src: url('file:///usr/share/texmf/fonts/opentype/public/tex-gyre/texgyrepagella-bolditalic.otf') format('opentype'); font-weight: 600; font-style: italic; }
+  @font-face { font-family: 'LoraFB'; src: url('file:///usr/share/fonts/truetype/google-fonts/Lora-Variable.ttf') format('truetype'); font-weight: 400 700; }
+  @font-face { font-family: 'LoraFB'; src: url('file:///usr/share/fonts/truetype/google-fonts/Lora-Italic-Variable.ttf') format('truetype'); font-weight: 400 700; font-style: italic; }
+  @font-face { font-family: 'MonoFB'; src: url('file:///usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf') format('truetype'); font-weight: 400; }
+  @font-face { font-family: 'MonoFB'; src: url('file:///usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf') format('truetype'); font-weight: 600; }
+</style>
+<style>
+  :root {
+    --paper: #F6F2EA;
+    --ink: #15171F;
+    --ink-soft: #4A4E5C;
+    --rule: #C9C2B4;
+    --rule-soft: #E2DCCF;
+    --accent: #B8553A;
+    --accent-soft: #EFD6CC;
+    --chip-prompt: #2C3E66;
+    --chip-filter: #3D5C3A;
+    --chip-inferred: #7A5A2E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: 'Newsreader', 'LoraFB', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.55;
+    padding: 60px 40px 100px;
+  }
+
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  /* ---------- COVER ---------- */
+  .cover {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 48px;
+    margin-bottom: 56px;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  h1 {
+    font-family: 'Fraunces', 'PagellaFB', serif;
+    font-weight: 500;
+    font-size: 56px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .lede {
+    font-size: 20px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 640px;
+    font-style: italic;
+  }
+
+  /* ---------- BRIEF ---------- */
+  .brief {
+    margin-bottom: 96px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', 'PagellaFB', serif;
+    font-weight: 500;
+    font-size: 32px;
+    letter-spacing: -0.015em;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .brief-grid {
+    display: block;
+    margin-top: 8px;
+  }
+
+  .brief-block {
+    margin-bottom: 36px;
+    page-break-inside: avoid;
+  }
+
+  .brief-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .brief-block h3 {
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 500;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  .brief-block p {
+    margin-bottom: 12px;
+  }
+
+  .brief-block ul {
+    list-style: none;
+  }
+
+  .brief-block li {
+    padding-left: 22px;
+    position: relative;
+    margin-bottom: 10px;
+    line-height: 1.45;
+  }
+
+  .brief-block li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+  }
+
+  .brief-block li b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .principles li::before { content: counter(p, decimal-leading-zero); counter-increment: p; font-size: 11px; top: 4px; font-weight: 500; }
+  .principles { counter-reset: p; }
+  .principles li { padding-left: 36px; }
+
+  .span-2 { grid-column: span 2; }
+
+  .pull {
+    font-family: 'Fraunces', 'PagellaFB', serif;
+    font-size: 22px;
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--ink);
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 22px;
+    margin: 8px 0;
+    max-width: 700px;
+  }
+
+  /* ---------- WIREFRAMES ---------- */
+  .frames {
+    margin-top: 24px;
+  }
+
+  .frame {
+    margin-bottom: 80px;
+    page-break-inside: avoid;
+  }
+
+  .frame-head {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--rule);
+  }
+
+  .frame-num {
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .frame-title {
+    font-family: 'Fraunces', 'PagellaFB', serif;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .frame-sub {
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-left: auto;
+  }
+
+  .frame-body {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 28px;
+    align-items: start;
+    margin-top: 22px;
+  }
+
+  /* ---- WIREFRAME CANVAS ---- */
+  .wf {
+    background: #FFF;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 18px;
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    box-shadow: 4px 4px 0 var(--rule-soft);
+  }
+
+  .wf-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule-soft);
+    margin-bottom: 14px;
+    color: var(--ink-soft);
+    font-size: 10px;
+  }
+
+  .wf-bar .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--rule); }
+
+  .wf-input {
+    border: 1px dashed var(--ink-soft);
+    border-radius: 2px;
+    padding: 14px 16px;
+    background: #FAFAF8;
+    margin-bottom: 14px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    color: var(--ink-soft);
+  }
+
+  .wf-input.active {
+    border: 1.5px solid var(--ink);
+    background: #FFF;
+    color: var(--ink);
+  }
+
+  .wf-input .cursor {
+    display: inline-block;
+    width: 1px;
+    height: 14px;
+    background: var(--ink);
+    margin-left: 2px;
+    vertical-align: middle;
+  }
+
+  /* CHIPS */
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 2px;
+    font-size: 11px;
+    border: 1px solid;
+    background: #FFF;
+    white-space: nowrap;
+  }
+
+  .chip .src { font-size: 10px; opacity: 0.7; }
+  .chip .x { margin-left: 4px; opacity: 0.5; cursor: pointer; }
+
+  .chip.prompt { color: var(--chip-prompt); border-color: var(--chip-prompt); background: #F3F5FA; }
+  .chip.filter { color: var(--chip-filter); border-color: var(--chip-filter); background: #F2F6F1; }
+  .chip.inferred { color: var(--chip-inferred); border-color: var(--chip-inferred); background: #FAF5EB; border-style: dashed; }
+  .chip.draft { opacity: 0.55; }
+  .chip.conflict { border: 1.5px solid var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+  /* Behavior layer: orthogonal to source. Rule = must pass, Pref = ranks results. */
+  .chip.pref { border-style: dashed; }
+  .chip .behavior { font-size: 9px; opacity: 0.55; margin-left: 3px; font-weight: 500; letter-spacing: 0.04em; }
+
+  /* Iteration ladder */
+  .ladder {
+    margin: 10px 0 14px;
+    padding: 10px 12px;
+    background: #FCFBF8;
+    border: 1px solid var(--rule-soft);
+    border-radius: 2px;
+    font-size: 10px;
+    line-height: 1.7;
+  }
+  .ladder .lh {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .ladder .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 2px 0;
+    color: var(--ink-soft);
+  }
+  .ladder .row.current { color: var(--ink); font-weight: 500; }
+  .ladder .row.current .n { color: var(--accent); font-weight: 600; }
+  .ladder .label { font-family: inherit; }
+  .ladder .n { font-family: 'Fraunces', 'PagellaFB', serif; font-size: 12px; font-weight: 500; }
+
+  /* Chip context menu (right-click / hover) */
+  .chip-ctx {
+    position: relative;
+    display: inline-block;
+  }
+  .chip-ctx-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 5;
+    background: #FFF;
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    box-shadow: 2px 2px 0 var(--rule-soft);
+    padding: 0;
+    min-width: 180px;
+    font-size: 11px;
+  }
+  .chip-ctx-menu .item {
+    padding: 7px 12px;
+    color: var(--ink);
+    border-bottom: 1px dotted var(--rule-soft);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .chip-ctx-menu .item:last-child { border-bottom: none; }
+  .chip-ctx-menu .item:hover { background: #FCFBF8; }
+  .chip-ctx-menu .item.current { color: var(--ink-soft); }
+  .chip-ctx-menu .item.current::before { content: "✓ "; color: var(--accent); }
+  .chip-ctx-menu .item .impact {
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+  }
+  .chip-ctx-menu .item.danger { color: var(--accent); }
+
+  /* Open menu (Loosen/Tighten) */
+  .menu-open {
+    margin: 8px 0 14px;
+    border: 1px solid var(--ink);
+    background: #FFF;
+    border-radius: 2px;
+    padding: 0;
+    box-shadow: 2px 2px 0 var(--rule-soft);
+  }
+  .menu-open .menu-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--rule-soft);
+    font-size: 11px;
+  }
+  .menu-open .menu-head .title { font-weight: 500; color: var(--ink); }
+  .menu-open .menu-head .sub { font-size: 9px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; }
+  .menu-open .opt {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 12px;
+    font-size: 11px;
+    border-bottom: 1px dotted var(--rule-soft);
+    cursor: pointer;
+  }
+  .menu-open .opt:last-child { border-bottom: none; }
+  .menu-open .opt:hover { background: #FCFBF8; }
+  .menu-open .opt .what { color: var(--ink); }
+  .menu-open .opt .impact { font-family: 'JetBrains Mono', 'MonoFB', monospace; font-size: 10px; font-weight: 500; }
+  .menu-open .opt .impact.neg { color: var(--accent); }
+  .menu-open .opt .impact.pos { color: var(--chip-filter); }
+
+  .chip-add {
+    color: var(--ink-soft);
+    border: 1px dashed var(--rule);
+    padding: 5px 9px;
+    font-size: 11px;
+    border-radius: 2px;
+    background: transparent;
+  }
+
+  /* PANELS */
+  .wf-row {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 14px;
+  }
+
+  .panel {
+    border: 1px solid var(--rule-soft);
+    padding: 12px;
+    border-radius: 2px;
+    background: #FCFBF8;
+  }
+
+  .panel-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .panel-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 11px;
+    border-bottom: 1px dotted var(--rule-soft);
+  }
+
+  .panel-row:last-child { border-bottom: none; }
+
+  .panel-row .v { color: var(--ink-soft); }
+
+  /* RESULT CARDS */
+  .result-card {
+    border: 1px solid var(--rule-soft);
+    padding: 14px;
+    margin-bottom: 8px;
+    border-radius: 2px;
+    background: #FFF;
+  }
+
+  .result-card .name {
+    font-family: 'Fraunces', 'PagellaFB', serif;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .result-card .meta {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+  }
+
+  .match-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .match-strip .chip { font-size: 10px; padding: 3px 7px; }
+
+  .match-expand {
+    border-top: 1px dotted var(--rule-soft);
+    margin-top: 10px;
+    padding-top: 10px;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .match-expand .matched { color: var(--ink); font-weight: 500; }
+  .match-expand .gap { color: var(--accent); text-decoration: line-through; opacity: 0.7; }
+
+  /* CONFLICT BAR */
+  .conflict-box {
+    border: 1.5px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 10px 12px;
+    border-radius: 2px;
+    margin: 6px 0 14px;
+    font-size: 11px;
+    color: var(--ink);
+  }
+
+  .conflict-box .q {
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+
+  .conflict-box .choices {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .conflict-box .choice {
+    background: #FFF;
+    border: 1px solid var(--accent);
+    padding: 3px 8px;
+    font-size: 10px;
+    border-radius: 2px;
+    color: var(--accent);
+  }
+
+  /* GEO TYPEAHEAD */
+  .typeahead {
+    border: 1px solid var(--ink-soft);
+    background: #FFF;
+    padding: 4px 0;
+    margin-top: -10px;
+    margin-bottom: 12px;
+  }
+
+  .ta-item {
+    padding: 7px 12px;
+    font-size: 11px;
+    border-bottom: 1px solid var(--rule-soft);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .ta-item:last-child { border: none; }
+  .ta-item.hl { background: #F3F5FA; }
+  .ta-item .type { color: var(--ink-soft); font-size: 10px; }
+
+  .breadcrumb {
+    font-size: 10px;
+    color: var(--ink-soft);
+    padding: 6px 0;
+    letter-spacing: 0.04em;
+  }
+
+  /* COUNTER */
+  .count-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    margin: 10px 0;
+    font-size: 11px;
+  }
+
+  .count-bar .n { font-family: 'Fraunces', 'PagellaFB', serif; font-weight: 600; font-size: 14px; }
+
+  /* RECENT SEARCHES */
+  .recent {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .recent-card {
+    border: 1px solid var(--rule-soft);
+    padding: 10px;
+    border-radius: 2px;
+    background: #FCFBF8;
+  }
+
+  .recent-card .rc-title { font-weight: 500; font-size: 11px; margin-bottom: 4px; }
+  .recent-card .rc-meta { font-size: 10px; color: var(--ink-soft); }
+
+  .hint {
+    font-size: 10px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  /* ANNOTATIONS */
+  .notes {
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--ink);
+    padding-top: 4px;
+  }
+
+  .notes .label {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .notes ul { list-style: none; }
+  .notes li {
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--rule);
+    line-height: 1.5;
+  }
+  .notes li:last-child { border-bottom: none; }
+  .notes li strong { font-weight: 500; color: var(--accent); display: block; font-size: 10px; letter-spacing: 0.06em; margin-bottom: 2px; text-transform: uppercase; }
+
+  /* CLOSING */
+  .closing {
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .closing-grid {
+    display: table;
+    width: 100%;
+    margin-top: 28px;
+    border-collapse: separate;
+    border-spacing: 24px 0;
+  }
+
+  .closing-grid > div {
+    display: table-cell;
+    width: 50%;
+    vertical-align: top;
+  }
+
+  .colophon {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule-soft);
+    font-family: 'JetBrains Mono', 'MonoFB', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 760px) {
+    body { padding: 32px 20px 60px; }
+    h1 { font-size: 38px; }
+    .brief-grid, .closing-grid, .frame-body { grid-template-columns: 1fr; gap: 28px; }
+    .frame-sub { margin-left: 0; }
+    .wf-row { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    body { padding: 24px; }
+    .frame, .brief, .closing { page-break-inside: avoid; }
+    .wf { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============== COVER ============== -->
+  <div class="cover">
+    <div class="eyebrow">
+      <span>FounderNest · Design Case · Phase 2</span>
+      <span>D. Pinto-Coelho · 2026</span>
+    </div>
+    <h1>Designing a <em>shared</em> language for prompts and filters.</h1>
+    <p class="lede">Recruiters already move between natural language and structured filters when they source. This concept makes both inputs produce the same editable search state: visible criteria, explicit rules, and candidate cards that explain why someone matched.</p>
+  </div>
+
+  <!-- ============== BRIEF ============== -->
+  <section class="brief">
+    <div class="section-label">One-page brief</div>
+    <h2>The thinking before the screens</h2>
+
+    <div class="brief-grid">
+
+      <div class="brief-block span-2">
+        <h3>Problem framing</h3>
+        <p>Today's search splits across two surfaces: a freeform prompt and a structured filter panel. They both feed the same results, but the recruiter can't see which criteria came from where, which ones are firm rules versus loose preferences, or what the system inferred along the way. Editing usually means starting over. The cost isn't typing speed, it's the gap between what the recruiter meant and what the result set actually represents.</p>
+        <div class="pull">A recruiter should be able to see which criteria shaped a result, and change those criteria without starting over.</div>
+      </div>
+
+      <div class="brief-block">
+        <h3>Key assumptions</h3>
+        <ul>
+          <li>The prompt parser is useful but imperfect. Extractions need to be visible and removable per item, not in bulk.</li>
+          <li>Sourcing is iterative. The work is usually converging from a thousand candidates to thirty, not getting the right answer on the first try.</li>
+          <li>Result count is the recruiter's main feedback signal. It belongs on screen at all times.</li>
+          <li>Geography is the hardest filter to design. Disambiguation and progressive disclosure beat a wall of dropdowns.</li>
+          <li>Recruiters accept inferred suggestions if those suggestions are clearly labeled and easy to remove.</li>
+        </ul>
+      </div>
+
+      <div class="brief-block">
+        <h3>Design principles</h3>
+        <ul class="principles">
+          <li><b>Prompt output starts as editable draft criteria.</b> Drafts wait for Enter. Nothing applies on a timer.</li>
+          <li><b>Prompt and filter inputs land in the same applied-state row.</b> The chip row is the editor for both.</li>
+          <li><b>Every chip shows its origin.</b> Recruiters can tell what they typed, what they clicked, and what the system inferred.</li>
+          <li><b>Conflicts ask for a choice instead of blocking the search.</b> Contradictions appear as inline questions with the result count for each option.</li>
+          <li><b>Rule vs preference is part of every chip.</b> Solid borders are rules (candidates must pass). Dashed borders are preferences (they shape ranking). Inferred chips start as preferences until confirmed. One click promotes or demotes any chip.</li>
+        </ul>
+      </div>
+
+      <div class="brief-block span-2">
+        <h3>What "good" looks like</h3>
+        <ul>
+          <li>A recruiter goes from an open role to roughly thirty plausible candidates in under a minute, with a clear sense of why each one appears.</li>
+          <li>Editing a result set never requires going back to the prompt. Adjustments happen on the chip row.</li>
+          <li>The system doesn't ask for confirmation. It asks the recruiter to choose between concrete options, with the count for each option visible.</li>
+          <li>Zero-result and overly-broad states behave like guided refinement, not error messages. The next suggested step is always one small change away.</li>
+        </ul>
+      </div>
+
+      <div class="brief-block span-2">
+        <h3>What I cut, and why</h3>
+        <p>No algorithmic explanations of why specific candidates were ranked a certain way. For an MVP, showing which chips matched is more honest than inventing a confidence score. No separate "advanced filter" surface: if a filter doesn't deserve a chip, it doesn't need to exist yet. No undo stack: removing chips one by one already serves as edit history. No saved-search management screen in this round, since recent searches on the start screen cover most of the use case.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============== WIREFRAMES ============== -->
+  <section class="frames">
+    <div class="section-label">Wireframes</div>
+    <h2>Six screens</h2>
+
+    <!-- =========== FRAME 1 =========== -->
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-num">01</span>
+        <span class="frame-title">Start state</span>
+        <span class="frame-sub">Empty input, surface what was useful last time</span>
+      </div>
+      <div class="frame-body">
+        <div class="wf">
+          <div class="wf-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:auto">recruit.foundernest.com</span></div>
+          <div style="text-align:center; padding: 24px 0 8px; font-family:'Fraunces', 'PagellaFB', serif; font-size:18px;">Who are you looking for?</div>
+          <div class="wf-input">Describe a candidate, or start from filters →</div>
+          <div style="font-size:10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.1em; margin: 18px 0 4px;">Recent searches</div>
+          <div class="recent">
+            <div class="recent-card">
+              <div class="rc-title">Senior Frontend · Lisbon · 5+y</div>
+              <div class="rc-meta">14 candidates · 2 days ago</div>
+            </div>
+            <div class="recent-card">
+              <div class="rc-title">Head of Sales · Fintech · MX City</div>
+              <div class="rc-meta">8 candidates · last week</div>
+            </div>
+            <div class="recent-card">
+              <div class="rc-title">Backend · Python · Berlin/EU-remote</div>
+              <div class="rc-meta">23 candidates · today</div>
+            </div>
+            <div class="recent-card" style="border-style:dashed; opacity:0.7;">
+              <div class="rc-title">+ Start blank with filters</div>
+              <div class="rc-meta">No prompt</div>
+            </div>
+          </div>
+        </div>
+        <div class="notes">
+          <span class="label">Notes</span>
+          <ul>
+            <li><strong>Single entry point</strong> The same input accepts a typed description or a click into the filter panel. No tab to switch between modes.</li>
+            <li><strong>Recent searches first</strong> Most recruiters re-run a previous search with one or two changes. Surfacing them on the start screen removes a step.</li>
+            <li><strong>Filter-only path</strong> The dashed card respects recruiters who prefer to build a search by clicking, not typing.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========== FRAME 2 =========== -->
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-num">02</span>
+        <span class="frame-title">Prompt entry, parsed live</span>
+        <span class="frame-sub">Drafts form below as the recruiter types</span>
+      </div>
+      <div class="frame-body">
+        <div class="wf">
+          <div class="wf-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:auto">new search</span></div>
+          <div class="wf-input active">Senior backend engineer with strong Python in Berlin for AI-native startup, open to EU-remote<span class="cursor"></span></div>
+          <div style="font-size:10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">Draft chips · tap to confirm, edit, or remove</div>
+          <div style="font-size:10px; color: var(--ink-soft); font-style: italic; margin-bottom: 8px;">Solid border = will apply as a rule. Dashed border = will apply as a preference. Tap any chip to flip before pressing Enter.</div>
+          <div class="chip-row">
+            <span class="chip prompt draft pref">[p] Senior <span class="x">×</span></span>
+            <span class="chip prompt draft">[p] Backend Engineer <span class="x">×</span></span>
+            <span class="chip prompt draft">[p] Python <span class="x">×</span></span>
+            <span class="chip prompt draft">[p] Berlin (city) <span class="x">×</span></span>
+            <span class="chip prompt draft">[p] Remote-friendly · EU <span class="x">×</span></span>
+            <span class="chip inferred draft">[i] AI / ML industry <span class="x">×</span></span>
+          </div>
+          <div class="hint">Press <b>Enter</b> to apply. <b>Esc</b> clears drafts. Drafts stay drafts until they're applied.</div>
+        </div>
+        <div class="notes">
+          <span class="label">Notes</span>
+          <ul>
+            <li><strong>Parsing is visible</strong> The recruiter sees each chip form as the prompt is typed, instead of waiting for a single result list to appear.</li>
+            <li><strong>Two signals per draft chip</strong> Color says where the chip came from (prompt, filter, inferred). Border style says how it will behave once applied (solid = rule, dashed = preference). Both are readable before the recruiter commits.</li>
+            <li><strong>Predicted behavior is editable now</strong> The parser proposes "Senior" and "AI/ML industry" as preferences because they read as soft signals. A tap flips any chip between rule and preference before pressing Enter, so the recruiter doesn't need to wait until after the search runs.</li>
+            <li><strong>Nothing applies until Enter</strong> No pause-to-commit, no smart timeout. Inferred chips need a second tap to confirm before they affect results.</li>
+            <li><strong>Failure mode</strong> If the parser returns zero chips, the search falls back to keyword matching and tells the recruiter that's what happened.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========== FRAME 3 =========== -->
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-num">03</span>
+        <span class="frame-title">Filter editing · hierarchical geography</span>
+        <span class="frame-sub">Type-ahead first, drill-down second</span>
+      </div>
+      <div class="frame-body">
+        <div class="wf">
+          <div class="wf-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:auto">edit filter: Location</span></div>
+          <div class="wf-row">
+            <div>
+              <div class="panel-title">Location · type or browse</div>
+              <div class="wf-input active" style="margin-bottom:0;">Madrid<span class="cursor"></span></div>
+              <div class="typeahead">
+                <div class="ta-item hl"><span>Madrid <span style="color:var(--ink-soft);">· Comunidad de Madrid · Spain</span></span><span class="type">city</span></div>
+                <div class="ta-item"><span>Comunidad de Madrid <span style="color:var(--ink-soft);">· Spain</span></span><span class="type">region</span></div>
+                <div class="ta-item"><span>Madrid metro <span style="color:var(--ink-soft);">· +50km radius</span></span><span class="type">area</span></div>
+                <div class="ta-item"><span>Madrid, NM <span style="color:var(--ink-soft);">· United States</span></span><span class="type">city</span></div>
+              </div>
+              <div class="breadcrumb">SELECTED · Spain › Comunidad de Madrid › Madrid</div>
+              <div style="border-top:1px dotted var(--rule); padding-top:10px; font-size:11px;">
+                <label style="display:flex; gap:6px; align-items:center; margin-bottom:6px;"><input type="checkbox" checked> Include nearby (50 km radius)</label>
+                <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"> Also show EU-remote candidates</label>
+              </div>
+              <button class="chip-add" style="margin-top:12px;">+ Add another location</button>
+            </div>
+            <div class="panel">
+              <div class="panel-title">All filters</div>
+              <div class="panel-row"><span>Title</span><span class="v">Senior Backend</span></div>
+              <div class="panel-row"><span>Skills</span><span class="v">Python +2</span></div>
+              <div class="panel-row"><span>Years</span><span class="v">5+</span></div>
+              <div class="panel-row" style="color: var(--accent);"><span>Location</span><span class="v">editing…</span></div>
+              <div class="panel-row"><span>Work</span><span class="v">Remote-friendly</span></div>
+              <div class="panel-row"><span>Industry</span><span class="v">AI / ML</span></div>
+              <div class="panel-row"><span>Languages</span><span class="v">—</span></div>
+              <div class="panel-row"><span>Last active</span><span class="v">90 days</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="notes">
+          <span class="label">Notes</span>
+          <ul>
+            <li><strong>One input handles all geographies</strong> Typing "Madrid" opens disambiguation. Typing "Spain" opens the region picker. The recruiter never traverses a four-level cascade of empty dropdowns.</li>
+            <li><strong>Full path stays visible</strong> The breadcrumb prevents the common "wait, which Madrid?" confusion when a city name exists in more than one country.</li>
+            <li><strong>Radius is opt-in</strong> The selection defaults to the exact area. "Include nearby" is one click, and applies as its own chip so it's removable independently.</li>
+            <li><strong>Multi-location is normal</strong> Senior roles often have two or three acceptable cities. Adding them in one search avoids running two parallel searches and merging results.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========== FRAME 4 =========== -->
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-num">04</span>
+        <span class="frame-title">Applied state · editing the active search</span>
+        <span class="frame-sub">Editable chip row, source and behavior labels</span>
+      </div>
+      <div class="frame-body">
+        <div class="wf">
+          <div class="wf-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:auto">results</span></div>
+          <div class="wf-input" style="padding:10px 14px; font-size:11px; min-height:auto; background:#FCFBF8;">Senior backend engineer with strong Python in Berlin for AI-native startup, open to EU-remote</div>
+          <div style="display:flex; gap:14px; font-size:9px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:4px;">
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; background:#F3F5FA; border:1px solid var(--chip-prompt);"></span> from prompt</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; background:#F2F6F1; border:1px solid var(--chip-filter);"></span> from filter</span>
+            <span style="display:flex; align-items:center; gap:4px;"><span style="width:8px; height:8px; background:#FAF5EB; border:1px dashed var(--chip-inferred);"></span> inferred</span>
+          </div>
+          <div style="font-size:10px; color:var(--ink-soft); margin-bottom:8px; font-style:italic;">Solid border = rule (candidate must pass). Dashed border = preference (shapes ranking).</div>
+          <div class="chip-row">
+            <span class="chip-ctx">
+              <span class="chip prompt pref">[p] Senior <span class="x">×</span></span>
+              <span class="chip-ctx-menu">
+                <div class="item">Make rule <span class="impact">23 → 17</span></div>
+                <div class="item current">Make preference (current)</div>
+                <div class="item danger">Remove chip</div>
+              </span>
+            </span>
+            <span class="chip prompt">[p] Backend Engineer <span class="x">×</span></span>
+            <span class="chip prompt">[p] Python <span class="x">×</span></span>
+            <span class="chip prompt">[p] Berlin · +50km <span class="x">×</span></span>
+            <span class="chip prompt">[p] Remote-friendly · EU <span class="x">×</span></span>
+            <span class="chip filter">[f] 5+ years <span class="x">×</span></span>
+            <span class="chip filter">[f] Active in 90d <span class="x">×</span></span>
+            <span class="chip inferred">[i] AI / ML industry <span class="x">×</span></span>
+            <button class="chip-add">+ Add criterion</button>
+          </div>
+          <div class="ladder">
+            <span class="lh">Search history · this session</span>
+            <div class="row"><span class="label">All candidates</span><span class="n">1,240</span></div>
+            <div class="row"><span class="label">+ Python</span><span class="n">420</span></div>
+            <div class="row"><span class="label">+ 5+ years</span><span class="n">110</span></div>
+            <div class="row"><span class="label">+ Berlin · +50km · EU-remote</span><span class="n">38</span></div>
+            <div class="row current"><span class="label">+ Active in 90d → now</span><span class="n">23</span></div>
+          </div>
+          <div class="count-bar">
+            <span><span class="n">23</span> candidates · sorted by match strength</span>
+            <span style="color:var(--ink-soft);">Loosen ▾  ·  <b style="color:var(--ink);">Tighten ▴</b>  ·  Save search</span>
+          </div>
+          <div class="menu-open">
+            <div class="menu-head">
+              <span class="title">Tighten search ▴</span>
+              <span class="sub">single-chip additions · ordered by predicted impact</span>
+            </div>
+            <div class="opt">
+              <span class="what">Require <b>MLOps</b> as a skill</span>
+              <span class="impact neg">−14 candidates</span>
+            </div>
+            <div class="opt">
+              <span class="what">Narrow <b>active in 90d → 30d</b></span>
+              <span class="impact neg">−8 candidates</span>
+            </div>
+            <div class="opt">
+              <span class="what">Exact title match <b>"Backend Engineer"</b> (no fuzzy)</span>
+              <span class="impact neg">−21 candidates</span>
+            </div>
+            <div class="opt">
+              <span class="what">Promote <b>[i] AI/ML industry</b> from preference to rule</span>
+              <span class="impact neg">−9 candidates</span>
+            </div>
+          </div>
+          <div style="height:60px; border:1px dashed var(--rule-soft); display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:10px;">[ result list below ]</div>
+        </div>
+        <div class="notes">
+          <span class="label">Notes</span>
+          <ul>
+            <li><strong>Each chip carries two signals</strong> Color tells the recruiter where the chip came from (prompt, filter, inferred). Border style tells them how it affects results (rule or preference). Both readable at a glance.</li>
+            <li><strong>Editing a chip's behavior is one click</strong> Right-click (or tap-hold) any chip to open the menu shown on "Senior". Each option previews the impact on the result count, so the recruiter sees what flipping the chip will do before doing it.</li>
+            <li><strong>Search history makes the path visible</strong> The ladder shows how the recruiter narrowed from 1,240 to 23. Clicking any step rewinds the search to that point.</li>
+            <li><strong>Tighten and Loosen show their options</strong> Each option in the open menu previews the result count before it's applied, so the recruiter can choose by impact instead of guessing.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========== FRAME 5 =========== -->
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-num">05</span>
+        <span class="frame-title">Conflict moment</span>
+        <span class="frame-sub">Inline choice with the result count for each option</span>
+      </div>
+      <div class="frame-body">
+        <div class="wf">
+          <div class="wf-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:auto">conflict detected</span></div>
+          <div class="wf-input" style="padding:10px 14px; font-size:11px; min-height:auto; background:#FCFBF8;">Senior backend engineer… open to EU-remote</div>
+          <div class="chip-row">
+            <span class="chip prompt pref">[p] Senior <span class="x">×</span></span>
+            <span class="chip prompt">[p] Backend Engineer <span class="x">×</span></span>
+            <span class="chip prompt">[p] Python <span class="x">×</span></span>
+            <span class="chip prompt conflict">[p] Remote-friendly · EU</span>
+            <span class="chip filter conflict">[f] On-site only (just added)</span>
+          </div>
+          <div class="conflict-box">
+            <div class="q">The prompt says <b>Remote-friendly · EU</b>. The filter just added says <b>On-site only</b>. Choose the rule for this search:</div>
+            <div class="choices">
+              <span class="choice">Use Remote-friendly · EU &nbsp;→&nbsp; <b>23</b></span>
+              <span class="choice">Use On-site only &nbsp;→&nbsp; <b>6</b></span>
+              <span class="choice">Allow either &nbsp;→&nbsp; <b>41</b></span>
+            </div>
+          </div>
+          <div class="count-bar">
+            <span><span class="n">23</span> candidates. <span style="color:var(--ink-soft);">From the last applied search. The new filter is on hold.</span></span>
+            <span style="color:var(--ink-soft);">Esc dismisses. Pick anytime from the chip menu.</span>
+          </div>
+          <div style="height:60px; border:1px dashed var(--rule-soft); display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-size:10px;">[ results from previous search · 23 candidates visible · new filter not yet active ]</div>
+        </div>
+        <div class="notes">
+          <span class="label">Notes</span>
+          <ul>
+            <li><strong>Conflicts read as questions</strong> "Choose the rule" keeps the recruiter in control. An error message wouldn't.</li>
+            <li><strong>Each option previews the count</strong> The recruiter can see what each choice does to the result set before picking one.</li>
+            <li><strong>The new filter is held, not applied</strong> The list below stays on the last applied search (23 candidates). The On-site chip is queued. No ambiguity about what the result list represents.</li>
+            <li><strong>Where this appears</strong> Only on direct contradictions like work preference, location absolutes, or seniority ranges. Softer tensions stay silent.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========== FRAME 6 =========== -->
+    <div class="frame">
+      <div class="frame-head">
+        <span class="frame-num">06</span>
+        <span class="frame-title">Results and why-this-candidate</span>
+        <span class="frame-sub">Plus edge cases: zero results, too broad</span>
+      </div>
+      <div class="frame-body">
+        <div class="wf">
+          <div class="wf-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:auto">23 candidates</span></div>
+
+          <div class="result-card">
+            <div class="name">Marta L.</div>
+            <div class="meta">Senior Backend Engineer · Berlin · 7 yrs · active 4 days ago</div>
+            <div class="match-strip">
+              <span class="chip prompt pref">[p] Senior</span>
+              <span class="chip prompt">[p] Backend Engineer</span>
+              <span class="chip prompt">[p] Python</span>
+              <span class="chip prompt">[p] Berlin</span>
+              <span class="chip filter">[f] 7y exp</span>
+              <span class="chip inferred">[i] AI/ML (3 roles)</span>
+            </div>
+            <div class="match-expand">
+              <span class="matched">Passed rules ·</span> Backend Engineer, Python, Berlin/EU-remote, 5+ years, active 90d &nbsp;&nbsp;<br>
+              <span class="matched">Matched preferences ·</span> Senior (Senior title), AI/ML (3 prior roles) &nbsp;&nbsp;<br>
+              <span class="matched">Gap ·</span> <span class="gap">Remote status unspecified on profile</span>
+            </div>
+          </div>
+
+          <div class="result-card" style="opacity:0.85;">
+            <div class="name">Karim H.</div>
+            <div class="meta">Backend Eng · Lisbon (open to relocate) · 6 yrs · active today</div>
+            <div class="match-strip">
+              <span class="chip prompt">[p] Backend Engineer</span>
+              <span class="chip prompt">[p] Python</span>
+              <span class="chip prompt">[p] Remote-friendly</span>
+              <span class="chip filter">[f] 6y exp</span>
+              <span class="chip inferred">[i] AI/ML (1 role)</span>
+            </div>
+            <div class="match-expand">
+              <span class="matched">Passed rules ·</span> Backend Engineer, Python, Remote-friendly, 5+ years, active 90d &nbsp;&nbsp;<br>
+              <span class="matched">Matched preferences ·</span> AI/ML (1 prior role)<br>
+              <span class="matched">Gap ·</span> <span class="gap">Berlin location (Lisbon-based, open to relocate)</span> · <span class="gap">Senior preference (title says "Backend Eng")</span>
+            </div>
+          </div>
+
+          <div class="conflict-box" style="background:#F8F5EE; border-color:var(--rule); color:var(--ink); margin-top:14px;">
+            <div class="q" style="font-style:normal;"><b>0 results?</b> The smallest relaxations that bring candidates back, with the new count for each:</div>
+            <div class="choices">
+              <span class="choice" style="border-color:var(--ink); color:var(--ink);">Drop "5+ years" → 47 candidates</span>
+              <span class="choice" style="border-color:var(--ink); color:var(--ink);">Expand Berlin to +100km → 12</span>
+              <span class="choice" style="border-color:var(--ink); color:var(--ink);">Move AI/ML to preference → 31</span>
+            </div>
+          </div>
+
+          <div class="conflict-box" style="background:#F8F5EE; border-color:var(--rule); color:var(--ink);">
+            <div class="q" style="font-style:normal;"><b>1,200 results?</b> The chip most likely to narrow without losing relevant candidates:</div>
+            <div class="choices">
+              <span class="choice" style="border-color:var(--ink); color:var(--ink);">Add years of experience range</span>
+              <span class="choice" style="border-color:var(--ink); color:var(--ink);">Narrow location to one city</span>
+            </div>
+          </div>
+
+        </div>
+        <div class="notes">
+          <span class="label">Notes</span>
+          <ul>
+            <li><strong>Three lines, three jobs</strong> Passed rules answer "is this candidate eligible?". Matched preferences answer "why is this candidate ranked here?". Gap answers "what should the recruiter expect on the call?".</li>
+            <li><strong>Karim has gaps but appears anyway</strong> Berlin is a rule, but it accepts "open to relocate". The gap line surfaces the trade-off so the recruiter isn't surprised when they open the profile.</li>
+            <li><strong>Same chip styling as the search row</strong> Chips in the match strip reuse the source and behavior styling from Frame 04. Nothing new to learn.</li>
+            <li><strong>Edge case suggestions are concrete</strong> Both zero and broad-result panels propose specific single-chip changes with their predicted count, instead of generic advice like "try fewer filters".</li>
+            <li><strong>Sort order</strong> Match strength is the default. Recency and alphabetical are available from the count bar.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============== CLOSING ============== -->
+  <section class="closing">
+    <div class="section-label">Coda</div>
+    <h2>What I'd build first, and what's next</h2>
+
+    <div class="closing-grid">
+      <div>
+        <h3 style="font-family:'JetBrains Mono', 'MonoFB', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px; color:var(--ink);">MVP scope (4 weeks)</h3>
+        <ul style="list-style:none;">
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Chip parser for: title, skills, location, seniority, work-pref, industry</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Source-tagged chip row ([p]/[f]/[i]) + inline removal</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ <b>Rule vs preference per chip</b> (solid/dashed border) with right-click promote/demote</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Hierarchical geography (country/region/city + radius + multi-location)</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ <b>Search history ladder</b> showing the path from broad to focused, with one-click rewind</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Loosen/Tighten menus with predicted count impact per option</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Three-line "why this candidate": passed rules · matched preferences · gaps</li>
+          <li style="padding:8px 0;">→ Work-pref/seniority conflict resolution with count-per-choice</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-family:'JetBrains Mono', 'MonoFB', monospace; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px; color:var(--ink);">Round two</h3>
+        <ul style="list-style:none;">
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Boolean grouping for advanced power users (still in chip language)</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Candidate-side "why was I shown" parity for trust</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Saved-search collaboration (share applied state with hiring manager)</li>
+          <li style="padding:8px 0; border-bottom:1px dotted var(--rule);">→ Per-chip weight tuning for power users (default: equal weighting within behavior tier)</li>
+          <li style="padding:8px 0;">→ Conflict templates (common patterns like remote-vs-on-site stored as 1-click resolutions)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="margin-top:48px; max-width: 720px;">
+      <div class="pull">The main design decision is to make prompt output and filter selections editable in the same place. Once active criteria are visible, conflict handling, result explanations, and search refinement can all reuse the same chip model.</div>
+    </div>
+
+    <div class="colophon">
+      <span>FounderNest · Phase 2 deliverable</span>
+      <span>D. Pinto-Coelho · May 2026</span>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
